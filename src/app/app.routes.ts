@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { CountryDetailComponent } from './country-detail/country-detail.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { NotFoundComponent } from './not-found-page/not-found.component';
+import { NotFoundPageComponent } from './not-found-page/not-found-page.component';
 
 export const routes: Routes = [
   {
@@ -15,10 +15,10 @@ export const routes: Routes = [
   },
   {
     path: 'not-found',
-    component: NotFoundComponent,
+    component: NotFoundPageComponent,
   },
   {
     path: '**',
-    component: NotFoundComponent,
+    component: NotFoundPageComponent,
   },
 ];
