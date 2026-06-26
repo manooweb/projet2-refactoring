@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 
 import { CountryDetailComponent } from './country-detail/country-detail.component';
-import { HomeComponent } from './dashboard/home.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { NotFoundComponent } from './not-found-page/not-found.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
+    component: DashboardComponent,
   },
   {
     path: 'country/:countryName',
