@@ -5,12 +5,12 @@ import Chart from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 
 @Component({
-    selector: 'app-home',
-    templateUrl: './home.component.html',
-    styleUrls: ['./home.component.scss'],
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.scss'],
     standalone: true,
 })
-export class HomeComponent implements OnInit {
+export class DashboardComponent implements OnInit {
   private olympicUrl = './assets/mock/olympic.json';
   public pieChart!: Chart<"pie", number[], string>;
   public totalCountries = 0
