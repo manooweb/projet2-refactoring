@@ -4,15 +4,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
-import { CountryComponent } from "./country-detail.component";
+import { CountryDetailComponent } from "./country-detail.component";
 
 describe('DetailComponent', () => {
-  let component: CountryComponent;
-  let fixture: ComponentFixture<CountryComponent>;
+  let component: CountryDetailComponent;
+  let fixture: ComponentFixture<CountryDetailComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CountryComponent],
+      imports: [CountryDetailComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -26,7 +26,7 @@ describe('DetailComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CountryComponent);
+    fixture = TestBed.createComponent(CountryDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
