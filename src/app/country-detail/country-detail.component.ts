@@ -6,13 +6,13 @@ import { Olympic, Participation } from 'src/app/models/olympic.model';
 
 
 @Component({
-    selector: 'app-country',
-    templateUrl: './country.component.html',
-    styleUrls: ['./country.component.scss'],
+    selector: 'app-country-detail',
+    templateUrl: './country-detail.component.html',
+    styleUrls: ['./country-detail.component.scss'],
     standalone: true,
     imports: [RouterLink]
 })
-export class CountryComponent implements OnInit {
+export class CountryDetailComponent implements OnInit {
   private olympicUrl = './assets/mock/olympic.json';
   public lineChart!: Chart<"line", number[], number>;
   public titlePage = '';
