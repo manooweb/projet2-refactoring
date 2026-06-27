@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic, Participation } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
@@ -23,7 +23,7 @@ export class CountryDetailComponent implements OnInit {
   totalAthletes = 0;
   error!: string;
 
-  constructor(private route: ActivatedRoute, private router: Router) {
+  constructor(private route: ActivatedRoute) {
   }
 
   ngOnInit() {
