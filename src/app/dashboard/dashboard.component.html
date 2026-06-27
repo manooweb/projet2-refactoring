@@ -1,16 +1,6 @@
-<app-header [headerData]="headerData" />
-<div>
-  <div>
-    <div class="split">
-      <div>
-        <p>Number of countries</p>
-        <p>{{ totalCountries$ | async }}</p>
-      </div>
-      <div>
-        <p>Number of JOs</p>
-        <p>{{ totalJOs$ | async }}</p>
-      </div>
-    </div>
-  </div>
+@if (headerData$ | async; as headerData) {
+  <app-header [headerData]="headerData" />
+}
+<main>
   <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
-</div>
+</main>

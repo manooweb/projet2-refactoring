@@ -1,21 +1,7 @@
-<app-header [headerData]="headerData" />
-<div>
-  <div>
-    <div class="split">
-      <div>
-        <p>Number of entries</p>
-        <p>{{ totalEntries$ | async }}</p>
-      </div>
-      <div>
-        <p>Total Number of medals</p>
-        <p>{{ totalMedals$ | async }}</p>
-      </div>
-      <div>
-        <p>Total Number of athletes</p>
-        <p>{{ totalAthletes$ | async }}</p>
-      </div>
-    </div>
-  </div>
+@if (headerData$ | async; as headerData) {
+  <app-header [headerData]="headerData" />
+}
+<main>
   <div class="chart-container wrapper-container">
     <div class="container">
       <canvas id="countryChart">{{ lineChart }}</canvas>
@@ -25,4 +11,4 @@
   <div class="center">
     <a routerLink="">Go back</a>
   </div>
-</div>
+</main>

@@ -25,19 +25,12 @@ export class CountryDetailComponent implements OnInit {
   private readonly dataService = inject(DataService);
   private readonly route = inject(ActivatedRoute);
 
-  private olympics$!: Observable<Olympic[]>;
-  headerData!: HeaderData;
+  headerData$!: Observable<HeaderData>;
   lineChart!: Chart<"line", number[], number>;
   error!: string;
-  totalEntries$!: Observable<number>;
-  totalMedals$!: Observable<number>;
-  totalAthletes$!: Observable<number>;
 
   ngOnInit() {
     const countryName = this.route.snapshot.params['countryName'];
-    this.headerData = {
-      title: countryName
-    };
 
     const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
       tap((selectedCountry: Olympic | undefined) => {
@@ -54,16 +47,27 @@ export class CountryDetailComponent implements OnInit {
       shareReplay(1)
     );
 
-    this.totalEntries$ = selectedCountry$.pipe(
-      map((selectedCountry: Olympic | undefined) => selectedCountry?.participations.length ?? 0)
-    );
+    this.headerData$ = selectedCountry$.pipe(
+      map((selectedCountry: Olympic | undefined) => {
 
-    this.totalMedals$ = selectedCountry$.pipe(
-      map((selectedCountry: Olympic | undefined) => selectedCountry?.participations.reduce((total, participation) => total + participation.medalsCount, 0) ?? 0)
-    );
-
-    this.totalAthletes$ = selectedCountry$.pipe(
-      map((selectedCountry: Olympic | undefined) => selectedCountry?.participations.reduce((total, participation) => total + participation.athleteCount, 0) ?? 0)
+        return {
+          title: selectedCountry?.country ?? countryName,
+          kpis: [
+            {
+              label: 'Number of entries',
+              value: selectedCountry?.participations.length ?? 0
+            },
+            {
+              label: 'Number of medals',
+              value: selectedCountry?.participations.reduce((total, participation) => total + participation.medalsCount, 0) ?? 0
+            },
+            {
+              label: 'Number of athletes',
+              value: selectedCountry?.participations.reduce((total, participation) => total + participation.athleteCount, 0) ?? 0
+            }
+          ]
+        };
+      })
     );
   }
 
