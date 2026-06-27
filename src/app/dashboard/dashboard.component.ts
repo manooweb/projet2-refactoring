@@ -5,6 +5,7 @@ import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,7 +34,7 @@ export class DashboardComponent implements OnInit {
           this.buildPieChart(countries, sumOfAllMedalsYears);
         }
       }),
-      catchError((error) => {
+      catchError((error: HttpErrorResponse) => {
         this.error = error.message;
         return of([]);
       }),
