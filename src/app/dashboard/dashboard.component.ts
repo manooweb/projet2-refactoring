@@ -1,15 +1,15 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Component, inject, OnInit} from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 
 @Component({
-    selector: 'app-dashboard',
-    templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.scss'],
-    standalone: true,
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  standalone: true,
 })
 export class DashboardComponent implements OnInit {
   private readonly router = inject(Router);
@@ -17,12 +17,12 @@ export class DashboardComponent implements OnInit {
   public pieChart!: Chart<"pie", number[], string>;
   public totalCountries = 0
   public totalJOs = 0
-  public error!:string
+  public error!: string
   titlePage = "Medals per Country";
 
   ngOnInit() {
-    this.DataService.getAllOlympics().pipe().subscribe(
-      (data) => {
+    this.DataService.getAllOlympics().pipe().subscribe({
+      next: (data) => {
         console.log(`Liste des données : ${JSON.stringify(data)}`);
         if (data && data.length > 0) {
           this.totalJOs = Array.from(new Set(data.map((i: Olympic) => i.participations.map(f => f.year)).flat())).length;
@@ -33,11 +33,11 @@ export class DashboardComponent implements OnInit {
           this.buildPieChart(countries, sumOfAllMedalsYears);
         }
       },
-      (error:HttpErrorResponse) => {
+      error: (error: HttpErrorResponse) => {
         console.log(`erreur : ${error}`);
         this.error = error.message
       }
-    )
+    });
   }
 
   buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
