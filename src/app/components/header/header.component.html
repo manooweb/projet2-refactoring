@@ -9,10 +9,10 @@
   }
 
   @if (headerData?.kpis; as  kpis) {
-    <div class="header-kpis">
+    <div class="header-kpi-list">
     @for (kpi of kpis; track kpi.label) {
-      <div class="header-kpi">
-        <p>{{ kpi.label }}</p>
+      <div class="kpi-card">
+        <h3>{{ kpi.label }}</h3>
         <p>{{ kpi.value }}</p>
       </div>
     }
