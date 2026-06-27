@@ -8,9 +8,11 @@ import { Observable, of } from 'rxjs';
 })
 export class DataService {
   private readonly httpClient = inject(HttpClient);
+  private readonly olympicUrl = './assets/mock/olympic.json';
+
 
   getAllOlympics(): Observable<Olympic[]> {
-    return of([]);
+    return this.httpClient.get<Olympic[]>(this.olympicUrl);
   }
 
 }
