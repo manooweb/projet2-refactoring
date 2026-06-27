@@ -12,14 +12,13 @@ import { DataService } from '../services/data.service';
     standalone: true,
 })
 export class DashboardComponent implements OnInit {
+  private readonly router = inject(Router);
   private readonly DataService = inject(DataService);
   public pieChart!: Chart<"pie", number[], string>;
   public totalCountries = 0
   public totalJOs = 0
   public error!:string
   titlePage = "Medals per Country";
-
-  constructor(private router: Router, private http:HttpClient) { }
 
   ngOnInit() {
     this.DataService.getAllOlympics().pipe().subscribe(
