@@ -6,13 +6,14 @@ import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { HeaderComponent } from "../components/header/header.component";
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [AsyncPipe]
+  imports: [AsyncPipe, HeaderComponent]
 })
 export class DashboardComponent implements OnInit {
   private readonly router = inject(Router);
