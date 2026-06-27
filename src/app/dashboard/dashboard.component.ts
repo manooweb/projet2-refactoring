@@ -23,7 +23,6 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.DataService.getAllOlympics().pipe().subscribe({
       next: (data) => {
-        console.log(`Liste des données : ${JSON.stringify(data)}`);
         if (data && data.length > 0) {
           this.totalJOs = Array.from(new Set(data.map((i: Olympic) => i.participations.map(f => f.year)).flat())).length;
           const countries: string[] = data.map((i: Olympic) => i.country);
@@ -34,7 +33,6 @@ export class DashboardComponent implements OnInit {
         }
       },
       error: (error: HttpErrorResponse) => {
-        console.log(`erreur : ${error}`);
         this.error = error.message
       }
     });
