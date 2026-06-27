@@ -41,7 +41,10 @@ export class DashboardComponent implements OnInit {
     );
 
     this.totalJOs$ = this.olympics$.pipe(
-      map((olympics: Olympic[]) => Array.from(new Set(olympics.flatMap((i: Olympic) => i.participations.map((f) => f.year)))).length)
+      map((olympics: Olympic[]) => {
+        const years = olympics.flatMap((i: Olympic) => i.participations.map((f) => f.year));
+        return new Set(years).size;
+      })
     );
 
     this.totalCountries$ = this.olympics$.pipe(
