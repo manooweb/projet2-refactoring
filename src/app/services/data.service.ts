@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Olympic } from '../models/olympic.model';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,4 +15,9 @@ export class DataService {
     return this.httpClient.get<Olympic[]>(this.olympicUrl);
   }
 
+  getCountryByName(countryName: string): Observable<Olympic | undefined> {
+    return this.getAllOlympics().pipe(
+      map((olympics: Olympic[]) => olympics.find((country: Olympic) => country.country === countryName))
+    );
+  }
 }
