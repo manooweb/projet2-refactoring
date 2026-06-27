@@ -62,16 +62,14 @@ export class CountryDetailComponent implements OnInit {
     this.totalMedals$ = this.olympics$.pipe(
       map((olympics: Olympic[]) => {
         const selectedCountry = this.findCountryByName(olympics, countryName);
-        const medals = selectedCountry?.participations.map(i => i.medalsCount) ?? [];
-        return medals.reduce((accumulator, item) => accumulator + item, 0);
+        return selectedCountry?.participations.reduce((total, participation) => total + participation.medalsCount, 0) ?? 0;
       })
     );
 
     this.totalAthletes$ = this.olympics$.pipe(
       map((olympics: Olympic[]) => {
         const selectedCountry = this.findCountryByName(olympics, countryName);
-        const nbAthletes = selectedCountry?.participations.map(i => i.athleteCount) ?? [];
-        return nbAthletes.reduce((accumulator, item) => accumulator + item, 0);
+        return selectedCountry?.participations.reduce((total, participation) => total + participation.athleteCount, 0) ?? 0;
       })
     );
   }
