@@ -1,8 +1,9 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic, Participation } from 'src/app/models/olympic.model';
+import { DataService } from '../services/data.service';
 
 
 @Component({
@@ -13,21 +14,22 @@ import { Olympic, Participation } from 'src/app/models/olympic.model';
   imports: [RouterLink]
 })
 export class CountryDetailComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
-  public lineChart!: Chart<"line", number[], number>;
-  public titlePage = '';
-  public totalEntries = 0;
-  public totalMedals = 0;
-  public totalAthletes = 0;
-  public error!: string;
+  private readonly dataService = inject(DataService);
 
-  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {
+  lineChart!: Chart<"line", number[], number>;
+  titlePage = '';
+  totalEntries = 0;
+  totalMedals = 0;
+  totalAthletes = 0;
+  error!: string;
+
+  constructor(private route: ActivatedRoute, private router: Router) {
   }
 
   ngOnInit() {
     let countryName: string | null = null
     this.route.paramMap.subscribe((param: ParamMap) => countryName = param.get('countryName'));
-    this.http.get<Olympic[]>(this.olympicUrl).pipe().subscribe({
+    this.dataService.getAllOlympics().pipe().subscribe({
       next: (data) => {
         if (data && data.length > 0) {
           const selectedCountry = data.find((i: Olympic) => i.country === countryName);
