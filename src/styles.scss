@@ -9,21 +9,10 @@ body {
   box-sizing: border-box;
 }
 
-.heading {
-    flex-direction: column;
-}
-
 .center {
     display: flex;
     justify-content: center;
     margin: 5px;
-
-    div {
-        background: #0b868f;
-        padding: 10px;
-        border-radius: 10px;
-        color: white;
-    }
 }
 
 .split {

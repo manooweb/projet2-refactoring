@@ -4,24 +4,27 @@ import Chart from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from "../components/header/header.component";
+import { HeaderData } from '../components/header/header-data.model';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [AsyncPipe, HeaderComponent]
+  imports: [AsyncPipe, HeaderComponent, NgClass]
 })
 export class DashboardComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dataService = inject(DataService);
   private olympics$!: Observable<Olympic[]>;
+  headerData: HeaderData = {
+    title: 'Medals per Country'
+  };
   pieChart!: Chart<"pie", number[], string>;
   error!: string
-  titlePage = "Medals per Country";
   totalJOs$!: Observable<number>;
   totalCountries$!: Observable<number>;
 
