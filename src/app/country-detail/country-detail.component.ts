@@ -1,16 +1,16 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic, Participation } from 'src/app/models/olympic.model';
 
 
 @Component({
-    selector: 'app-country-detail',
-    templateUrl: './country-detail.component.html',
-    styleUrls: ['./country-detail.component.scss'],
-    standalone: true,
-    imports: [RouterLink]
+  selector: 'app-country-detail',
+  templateUrl: './country-detail.component.html',
+  styleUrls: ['./country-detail.component.scss'],
+  standalone: true,
+  imports: [RouterLink]
 })
 export class CountryDetailComponent implements OnInit {
   private olympicUrl = './assets/mock/olympic.json';
@@ -27,8 +27,8 @@ export class CountryDetailComponent implements OnInit {
   ngOnInit() {
     let countryName: string | null = null
     this.route.paramMap.subscribe((param: ParamMap) => countryName = param.get('countryName'));
-    this.http.get<Olympic[]>(this.olympicUrl).pipe().subscribe(
-      (data) => {
+    this.http.get<Olympic[]>(this.olympicUrl).pipe().subscribe({
+      next: (data) => {
         if (data && data.length > 0) {
           const selectedCountry = data.find((i: Olympic) => i.country === countryName);
           this.titlePage = selectedCountry?.country ?? '';
@@ -42,10 +42,10 @@ export class CountryDetailComponent implements OnInit {
           this.buildChart(years, medals);
         }
       },
-      (error: HttpErrorResponse) => {
+      error: (error: HttpErrorResponse) => {
         this.error = error.message
       }
-    );
+    });
   }
 
   buildChart(years: number[], medals: number[]) {
