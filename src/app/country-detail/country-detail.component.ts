@@ -29,15 +29,8 @@ export class CountryDetailComponent implements OnInit {
 
   ngOnInit() {
     const countryName = this.route.snapshot.params['countryName'];
+
     this.olympics$ = this.dataService.getAllOlympics().pipe(
-      tap((olympics: Olympic[]) => {
-        if (olympics.length > 0) {
-          const selectedCountry = this.findCountryByName(olympics, countryName);
-          const years = selectedCountry?.participations.map(i => i.year) ?? [];
-          const medals = selectedCountry?.participations.map(i => i.medalsCount) ?? [];
-          this.buildChart(years, medals);
-        }
-      }),
       catchError((error: HttpErrorResponse) => {
         this.error = error.message;
         return of([]);
@@ -45,35 +38,34 @@ export class CountryDetailComponent implements OnInit {
       shareReplay(1)
     );
 
-    this.titlePage$ = this.olympics$.pipe(
-      map((olympics: Olympic[]) => {
-        const selectedCountry = this.findCountryByName(olympics, countryName);
-        return selectedCountry?.country ?? '';
-      })
+    const selectedCountry$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => this.findCountryByName(olympics || [], countryName)),
+      tap((selectedCountry: Olympic | undefined) => {
+        if (selectedCountry) {
+          const years = selectedCountry.participations.map(i => i.year) ?? [];
+          const medals = selectedCountry.participations.map(i => i.medalsCount) ?? [];
+          this.buildChart(years, medals);
+        }
+      }),
+      shareReplay(1)
     );
 
-    this.totalEntries$ = this.olympics$.pipe(
-      map((olympics: Olympic[]) => {
-        const selectedCountry = this.findCountryByName(olympics, countryName);
-        return selectedCountry?.participations.length ?? 0;
-      })
+    this.titlePage$ = selectedCountry$.pipe(
+      map((selectedCountry: Olympic | undefined) => selectedCountry?.country ?? '')
     );
 
-    this.totalMedals$ = this.olympics$.pipe(
-      map((olympics: Olympic[]) => {
-        const selectedCountry = this.findCountryByName(olympics, countryName);
-        return selectedCountry?.participations.reduce((total, participation) => total + participation.medalsCount, 0) ?? 0;
-      })
+    this.totalEntries$ = selectedCountry$.pipe(
+      map((selectedCountry: Olympic | undefined) => selectedCountry?.participations.length ?? 0)
     );
 
-    this.totalAthletes$ = this.olympics$.pipe(
-      map((olympics: Olympic[]) => {
-        const selectedCountry = this.findCountryByName(olympics, countryName);
-        return selectedCountry?.participations.reduce((total, participation) => total + participation.athleteCount, 0) ?? 0;
-      })
+    this.totalMedals$ = selectedCountry$.pipe(
+      map((selectedCountry: Olympic | undefined) => selectedCountry?.participations.reduce((total, participation) => total + participation.medalsCount, 0) ?? 0)
+    );
+
+    this.totalAthletes$ = selectedCountry$.pipe(
+      map((selectedCountry: Olympic | undefined) => selectedCountry?.participations.reduce((total, participation) => total + participation.athleteCount, 0) ?? 0)
     );
   }
-
 
   buildChart(years: number[], medals: number[]) {
     const lineChart = new Chart("countryChart", {
