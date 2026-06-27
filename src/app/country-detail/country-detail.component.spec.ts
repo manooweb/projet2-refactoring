@@ -1,8 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { CountryDetailComponent } from "./country-detail.component";
 
@@ -20,7 +19,9 @@ describe('DetailComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of(convertToParamMap({ countryName: 'France' })),
+            snapshot: {
+              params: { countryName: 'France' }
+            }
           },
         },
       ],
