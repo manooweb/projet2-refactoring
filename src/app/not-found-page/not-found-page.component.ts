@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
+import { BackButtonComponent } from '../components/back-button/back-button.component';
 
 @Component({
     selector: 'app-not-found',
@@ -8,8 +8,8 @@ import { HeaderComponent } from '../components/header/header.component';
     styleUrls: ['./not-found-page.component.scss'],
     standalone: true,
     imports: [
-      RouterLink,
-      HeaderComponent
+      HeaderComponent,
+      BackButtonComponent
     ]
 })
 
