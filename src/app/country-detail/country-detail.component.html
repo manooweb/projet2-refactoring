@@ -1,20 +1,20 @@
 <div>
   <div>
     <div class="center">
-      <div>{{ titlePage }}</div>
+      <div>{{ titlePage$ | async }}</div>
     </div>
     <div class="split">
       <div>
         <p>Number of entries</p>
-        <p>{{ totalEntries }}</p>
+        <p>{{ totalEntries$ | async }}</p>
       </div>
       <div>
         <p>Total Number of medals</p>
-        <p>{{ totalMedals }}</p>
+        <p>{{ totalMedals$ | async }}</p>
       </div>
       <div>
         <p>Total Number of athletes</p>
-        <p>{{ totalAthletes }}</p>
+        <p>{{ totalAthletes$ | async }}</p>
       </div>
     </div>
   </div>

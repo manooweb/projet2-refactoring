@@ -1,9 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import Chart from 'chart.js/auto';
-import { Olympic, Participation } from 'src/app/models/olympic.model';
+import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
+import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 
 @Component({
@@ -11,41 +13,69 @@ import { DataService } from '../services/data.service';
   templateUrl: './country-detail.component.html',
   styleUrls: ['./country-detail.component.scss'],
   standalone: true,
-  imports: [RouterLink]
+  imports: [AsyncPipe, RouterLink]
 })
 export class CountryDetailComponent implements OnInit {
   private readonly dataService = inject(DataService);
   private readonly route = inject(ActivatedRoute);
 
+  private olympics$!: Observable<Olympic[]>;
   lineChart!: Chart<"line", number[], number>;
-  titlePage = '';
-  totalEntries = 0;
-  totalMedals = 0;
-  totalAthletes = 0;
   error!: string;
+  titlePage$!: Observable<string>;
+  totalEntries$!: Observable<number>;
+  totalMedals$!: Observable<number>;
+  totalAthletes$!: Observable<number>;
 
   ngOnInit() {
     const countryName = this.route.snapshot.params['countryName'];
-    this.dataService.getAllOlympics().pipe().subscribe({
-      next: (data) => {
-        if (data && data.length > 0) {
-          const selectedCountry = data.find((i: Olympic) => i.country === countryName);
-          this.titlePage = selectedCountry?.country ?? '';
-          const participations = selectedCountry?.participations.map((i: Participation) => i);
-          this.totalEntries = participations?.length ?? 0;
+    this.olympics$ = this.dataService.getAllOlympics().pipe(
+      tap((olympics: Olympic[]) => {
+        if (olympics.length > 0) {
+          const selectedCountry = this.findCountryByName(olympics, countryName);
           const years = selectedCountry?.participations.map(i => i.year) ?? [];
           const medals = selectedCountry?.participations.map(i => i.medalsCount) ?? [];
-          this.totalMedals = medals.reduce((accumulator, item) => accumulator + item, 0);
-          const nbAthletes = selectedCountry?.participations.map(i => i.athleteCount) ?? []
-          this.totalAthletes = nbAthletes.reduce((accumulator, item) => accumulator + item, 0);
           this.buildChart(years, medals);
         }
-      },
-      error: (error: HttpErrorResponse) => {
-        this.error = error.message
-      }
-    });
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.error = error.message;
+        return of([]);
+      }),
+      shareReplay(1)
+    );
+
+    this.titlePage$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => {
+        const selectedCountry = this.findCountryByName(olympics, countryName);
+        return selectedCountry?.country ?? '';
+      })
+    );
+
+    this.totalEntries$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => {
+        const selectedCountry = this.findCountryByName(olympics, countryName);
+        return selectedCountry?.participations.length ?? 0;
+      })
+    );
+
+    this.totalMedals$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => {
+        const selectedCountry = this.findCountryByName(olympics, countryName);
+        const medals = selectedCountry?.participations.map(i => i.medalsCount) ?? [];
+        return medals.reduce((accumulator, item) => accumulator + item, 0);
+      })
+    );
+
+    this.totalAthletes$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => {
+        const selectedCountry = this.findCountryByName(olympics, countryName);
+        const nbAthletes = selectedCountry?.participations.map(i => i.athleteCount) ?? [];
+        return nbAthletes.reduce((accumulator, item) => accumulator + item, 0);
+      })
+    );
   }
+
 
   buildChart(years: number[], medals: number[]) {
     const lineChart = new Chart("countryChart", {
@@ -65,5 +95,9 @@ export class CountryDetailComponent implements OnInit {
       }
     });
     this.lineChart = lineChart;
+  }
+
+  private findCountryByName(olympics: Olympic[], countryName: string): Olympic | undefined {
+    return olympics.find((i: Olympic) => i.country === countryName);
   }
 }
