@@ -15,6 +15,7 @@ import { DataService } from '../services/data.service';
 })
 export class CountryDetailComponent implements OnInit {
   private readonly dataService = inject(DataService);
+  private readonly route = inject(ActivatedRoute);
 
   lineChart!: Chart<"line", number[], number>;
   titlePage = '';
@@ -22,9 +23,6 @@ export class CountryDetailComponent implements OnInit {
   totalMedals = 0;
   totalAthletes = 0;
   error!: string;
-
-  constructor(private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     let countryName: string | null = null
