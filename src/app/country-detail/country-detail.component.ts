@@ -7,6 +7,7 @@ import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { HeaderComponent } from '../components/header/header.component';
+import { HeaderData } from '../components/header/header-data.model';
 
 
 @Component({
@@ -25,15 +26,18 @@ export class CountryDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   private olympics$!: Observable<Olympic[]>;
+  headerData!: HeaderData;
   lineChart!: Chart<"line", number[], number>;
   error!: string;
-  titlePage$!: Observable<string>;
   totalEntries$!: Observable<number>;
   totalMedals$!: Observable<number>;
   totalAthletes$!: Observable<number>;
 
   ngOnInit() {
     const countryName = this.route.snapshot.params['countryName'];
+    this.headerData = {
+      title: countryName
+    };
 
     const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
       tap((selectedCountry: Olympic | undefined) => {
@@ -48,10 +52,6 @@ export class CountryDetailComponent implements OnInit {
         return of(undefined);
       }),
       shareReplay(1)
-    );
-
-    this.titlePage$ = selectedCountry$.pipe(
-      map((selectedCountry: Olympic | undefined) => selectedCountry?.country ?? '')
     );
 
     this.totalEntries$ = selectedCountry$.pipe(
