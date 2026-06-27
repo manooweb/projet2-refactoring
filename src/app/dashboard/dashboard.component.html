@@ -8,11 +8,11 @@
     <div class="split">
       <div>
         <p>Number of countries</p>
-        <p>{{ totalCountries }}</p>
+        <p>{{ totalCountries$ | async }}</p>
       </div>
       <div>
         <p>Number of JOs</p>
-        <p>{{ totalJOs }}</p>
+        <p>{{ totalJOs$ | async }}</p>
       </div>
     </div>
   </div>
