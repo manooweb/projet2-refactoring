@@ -7,4 +7,15 @@
       <h2>{{ headerData.title }}</h2>
     </div>
   }
+
+  @if (headerData?.kpis; as  kpis) {
+    <div class="header-kpis">
+    @for (kpi of kpis; track kpi.label) {
+      <div class="header-kpi">
+        <p>{{ kpi.label }}</p>
+        <p>{{ kpi.value }}</p>
+      </div>
+    }
+  </div>
+  }
 </header>

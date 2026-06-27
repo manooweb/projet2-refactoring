@@ -13,6 +13,6 @@ import { HeaderData } from './header-data.model';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  @Input() headerData!: HeaderData;
+  @Input() headerData?: HeaderData;
 
 }
