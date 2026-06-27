@@ -30,22 +30,17 @@ export class CountryDetailComponent implements OnInit {
   ngOnInit() {
     const countryName = this.route.snapshot.params['countryName'];
 
-    this.olympics$ = this.dataService.getAllOlympics().pipe(
-      catchError((error: HttpErrorResponse) => {
-        this.error = error.message;
-        return of([]);
-      }),
-      shareReplay(1)
-    );
-
-    const selectedCountry$ = this.olympics$.pipe(
-      map((olympics: Olympic[]) => this.findCountryByName(olympics || [], countryName)),
+    const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
       tap((selectedCountry: Olympic | undefined) => {
         if (selectedCountry) {
           const years = selectedCountry.participations.map(i => i.year) ?? [];
           const medals = selectedCountry.participations.map(i => i.medalsCount) ?? [];
           this.buildChart(years, medals);
         }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.error = error.message;
+        return of(undefined);
       }),
       shareReplay(1)
     );
@@ -85,9 +80,5 @@ export class CountryDetailComponent implements OnInit {
       }
     });
     this.lineChart = lineChart;
-  }
-
-  private findCountryByName(olympics: Olympic[], countryName: string): Olympic | undefined {
-    return olympics.find((i: Olympic) => i.country === countryName);
   }
 }
