@@ -1,41 +1,52 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
+import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
+  imports: [AsyncPipe]
 })
 export class DashboardComponent implements OnInit {
   private readonly router = inject(Router);
-  private readonly DataService = inject(DataService);
-  public pieChart!: Chart<"pie", number[], string>;
-  public totalCountries = 0
-  public totalJOs = 0
-  public error!: string
+  private readonly dataService = inject(DataService);
+  private olympics$!: Observable<Olympic[]>;
+  pieChart!: Chart<"pie", number[], string>;
+  error!: string
   titlePage = "Medals per Country";
+  totalJOs$!: Observable<number>;
+  totalCountries$!: Observable<number>;
 
   ngOnInit() {
-    this.DataService.getAllOlympics().pipe().subscribe({
-      next: (data) => {
-        if (data && data.length > 0) {
-          this.totalJOs = Array.from(new Set(data.map((i: Olympic) => i.participations.map(f => f.year)).flat())).length;
-          const countries: string[] = data.map((i: Olympic) => i.country);
-          this.totalCountries = countries.length;
-          const medals = data.map((i: Olympic) => i.participations.map(i => i.medalsCount));
+    this.olympics$ = this.dataService.getAllOlympics().pipe(
+      tap((olympics: Olympic[]) => {
+        if (olympics.length > 0) {
+          const countries: string[] = olympics.map((i: Olympic) => i.country);
+          const medals = olympics.map((i: Olympic) => i.participations.map(i => i.medalsCount));
           const sumOfAllMedalsYears = medals.map((i) => i.reduce((acc, i) => acc + i, 0));
           this.buildPieChart(countries, sumOfAllMedalsYears);
         }
-      },
-      error: (error: HttpErrorResponse) => {
-        this.error = error.message
-      }
-    });
+      }),
+      catchError((error) => {
+        this.error = error.message;
+        return of([]);
+      }),
+      shareReplay(1)
+    );
+
+    this.totalJOs$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => Array.from(new Set(olympics.flatMap((i: Olympic) => i.participations.map((f) => f.year)))).length)
+    );
+
+    this.totalCountries$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => olympics.length)
+    );
   }
 
   buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
