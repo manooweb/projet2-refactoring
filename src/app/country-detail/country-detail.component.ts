@@ -6,6 +6,7 @@ import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { HeaderComponent } from '../components/header/header.component';
 
 
 @Component({
@@ -13,7 +14,11 @@ import { AsyncPipe } from '@angular/common';
   templateUrl: './country-detail.component.html',
   styleUrls: ['./country-detail.component.scss'],
   standalone: true,
-  imports: [AsyncPipe, RouterLink]
+  imports: [
+    AsyncPipe,
+    RouterLink,
+    HeaderComponent
+  ]
 })
 export class CountryDetailComponent implements OnInit {
   private readonly dataService = inject(DataService);
