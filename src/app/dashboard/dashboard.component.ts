@@ -1,8 +1,9 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
+import { DataService } from '../services/data.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -11,7 +12,7 @@ import { Olympic } from 'src/app/models/olympic.model';
     standalone: true,
 })
 export class DashboardComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
+  private readonly DataService = inject(DataService);
   public pieChart!: Chart<"pie", number[], string>;
   public totalCountries = 0
   public totalJOs = 0
@@ -21,7 +22,7 @@ export class DashboardComponent implements OnInit {
   constructor(private router: Router, private http:HttpClient) { }
 
   ngOnInit() {
-    this.http.get<Olympic[]>(this.olympicUrl).pipe().subscribe(
+    this.DataService.getAllOlympics().pipe().subscribe(
       (data) => {
         console.log(`Liste des données : ${JSON.stringify(data)}`);
         if (data && data.length > 0) {
