@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
@@ -8,6 +8,7 @@ import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { HeaderComponent } from '../components/header/header.component';
 import { HeaderData } from '../components/header/header-data.model';
+import { BackButtonComponent } from "../components/back-button/back-button.component";
 
 
 @Component({
@@ -17,9 +18,9 @@ import { HeaderData } from '../components/header/header-data.model';
   standalone: true,
   imports: [
     AsyncPipe,
-    RouterLink,
-    HeaderComponent
-  ]
+    HeaderComponent,
+    BackButtonComponent
+]
 })
 export class CountryDetailComponent implements OnInit {
   private readonly dataService = inject(DataService);
