@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import Chart from 'chart.js/auto';
+import Chart, { ChartConfiguration } from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
@@ -9,6 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from "../components/header/header.component";
 import { KpiList } from '../components/kpi-list/kpi.model';
 import { MedalChartComponent } from '../components/medal-chart/medal-chart.component';
+import { MedalChartService } from '../serices/medal-chart.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,13 +22,14 @@ import { MedalChartComponent } from '../components/medal-chart/medal-chart.compo
     MedalChartComponent
   ]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly dataService = inject(DataService);
+  private readonly medalChartService = inject(MedalChartService);
   private olympics$!: Observable<Olympic[]>;
   kpiList$!: Observable<KpiList>;
   chartId = 'DashboardPieChart';
-  pieChart!: Chart<"pie", number[], string>;
+  chart!: Chart;
   error!: string
 
   ngOnInit() {
@@ -37,7 +39,13 @@ export class DashboardComponent implements OnInit {
           const countries: string[] = olympics.map((i: Olympic) => i.country);
           const medals = olympics.map((i: Olympic) => i.participations.map(i => i.medalsCount));
           const sumOfAllMedalsYears = medals.map((i) => i.reduce((acc, i) => acc + i, 0));
-          this.buildPieChart(countries, sumOfAllMedalsYears);
+          const chartData: ChartConfiguration = this.buildChartData(countries, sumOfAllMedalsYears);
+          this.chart?.destroy();
+          this.chart = this.medalChartService.createChart(
+            this.chartId,
+            chartData,
+            (countryName: string) => { this.router.navigate(['country', countryName]) }
+          );
         }
       }),
       catchError((error: HttpErrorResponse) => {
@@ -68,33 +76,23 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
-    const pieChart = new Chart(this.chartId, {
+  ngOnDestroy(): void {
+    this.chart?.destroy();
+  }
+  
+  private buildChartData(countries: string[], sumOfAllMedalsYears: number[]): ChartConfiguration {
+    return {
       type: 'pie',
       data: {
         labels: countries,
         datasets: [{
           label: 'Medals',
           data: sumOfAllMedalsYears,
-          backgroundColor: ['#0b868f', '#adc3de', '#7a3c53', '#8f6263', 'orange', '#94819d'],
+          backgroundColor: ['#0b868f', '#adc3de', '#7a3c53', '#8f6263', '#E69500'],
           hoverOffset: 4
         }],
       },
-      options: {
-        responsive: true,
-        onClick: (e) => {
-          if (e.native) {
-            const points = pieChart.getElementsAtEventForMode(e.native, 'point', { intersect: true }, true)
-            if (points.length) {
-              const firstPoint = points[0];
-              const countryName = pieChart.data.labels ? pieChart.data.labels[firstPoint.index] : '';
-              this.router.navigate(['country', countryName]);
-            }
-          }
-        }
-      }
-    });
-    this.pieChart = pieChart;
+    };
   }
 }
 
