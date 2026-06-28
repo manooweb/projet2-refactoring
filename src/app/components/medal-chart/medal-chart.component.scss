@@ -1,0 +1,27 @@
+.chart-container-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  .chart-container {
+    width: 50%;
+
+    &.pie {
+      display: flex;
+      justify-content: center;
+      height: 50vh;
+    }
+
+    p{
+      font-size: 2.2rem;
+      text-align: center;
+      color: gray;
+    }
+  }
+
+  @media screen and (max-width: 1199px) {
+    .chart-container {
+      width: 90%;
+    }
+  }
+}

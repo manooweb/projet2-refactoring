@@ -9,6 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { HeaderComponent } from '../components/header/header.component';
 import { KpiList } from '../components/kpi-list/kpi.model';
 import { BackButtonComponent } from "../components/back-button/back-button.component";
+import { MedalChartComponent } from "../components/medal-chart/medal-chart.component";
 
 
 @Component({
@@ -19,7 +20,8 @@ import { BackButtonComponent } from "../components/back-button/back-button.compo
   imports: [
     AsyncPipe,
     HeaderComponent,
-    BackButtonComponent
+    BackButtonComponent,
+    MedalChartComponent
 ]
 })
 export class CountryDetailComponent implements OnInit {
@@ -27,6 +29,7 @@ export class CountryDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   kpiList$!: Observable<KpiList>;
+  chartId = 'countryChart';
   lineChart!: Chart<"line", number[], number>;
   error!: string;
 
@@ -73,7 +76,7 @@ export class CountryDetailComponent implements OnInit {
   }
 
   buildChart(years: number[], medals: number[]) {
-    const lineChart = new Chart("countryChart", {
+    const lineChart = new Chart(this.chartId, {
       type: 'line',
       data: {
         labels: years,
@@ -86,7 +89,7 @@ export class CountryDetailComponent implements OnInit {
         ]
       },
       options: {
-        aspectRatio: 2.5
+        responsive: true,
       }
     });
     this.lineChart = lineChart;

@@ -2,11 +2,9 @@
   <app-header [kpiList]="kpiList" />
 }
 <main>
-  <div class="chart-container wrapper-container">
-    <div class="container">
-      <canvas id="countryChart">{{ lineChart }}</canvas>
-      <p>Dates</p>
-    </div>
-  </div>
+  <app-medal-chart
+   [canvasId]="chartId"
+   label="Line chart showing country medals by Olympic participation year"
+   chartLegend="Dates" />
   <app-back-button />
 </main>

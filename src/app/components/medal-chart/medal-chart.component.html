@@ -1,0 +1,13 @@
+<div class="chart-container-wrapper">
+  <div class="chart-container" [class.pie]="chartType === 'pie'">
+    <canvas
+      [id]="canvasId"
+      [attr.aria-label]="label"
+      role="img">
+      {{ label }}
+    </canvas>
+    @if (chartLegend) {
+      <p>{{ chartLegend }}</p>
+    }
+  </div>
+</div>
