@@ -10,7 +10,7 @@ import { HeaderComponent } from '../components/header/header.component';
 import { KpiList } from '../components/kpi-list/kpi.model';
 import { BackButtonComponent } from "../components/back-button/back-button.component";
 import { MedalChartComponent } from "../components/medal-chart/medal-chart.component";
-import { MedalChartService } from '../serices/medal-chart.service';
+import { MedalChartService } from '../services/medal-chart.service';
 
 
 @Component({
@@ -41,9 +41,9 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
     const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
       tap((selectedCountry: Olympic | undefined) => {
         if (selectedCountry) {
-          const years = selectedCountry.participations.map(i => i.year) ?? [];
-          const medals = selectedCountry.participations.map(i => i.medalsCount) ?? [];
-          const chartData: ChartConfiguration = this.buildChartData(years, medals);
+          const participationYears = selectedCountry.participations.map(participation => participation.year) ?? [];
+          const medalCounts = selectedCountry.participations.map(participation => participation.medalsCount) ?? [];
+          const chartData: ChartConfiguration = this.buildChartData(participationYears, medalCounts);
           this.chart?.destroy();
           this.chart = this.medalChartService.createChart(
             this.chartId,
@@ -86,15 +86,15 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
     this.chart?.destroy();
   }
 
-  private buildChartData(years: number[], medals: number[]): ChartConfiguration {
+  private buildChartData(participationYears: number[], medalCounts: number[]): ChartConfiguration {
     return {
       type: 'line',
       data: {
-        labels: years,
+        labels: participationYears,
         datasets: [
           {
-            label: "medals",
-            data: medals,
+            label: "Medals",
+            data: medalCounts,
             backgroundColor: '#0b868f'
           },
         ]

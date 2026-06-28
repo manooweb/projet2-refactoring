@@ -22,7 +22,7 @@ export class MedalChartService {
         if (!event.native) {
           return;
         }
-        const points = chart.getElementsAtEventForMode(event.native, 'point', { intersect: true }, true)
+        const points = chart.getElementsAtEventForMode(event.native, 'point', { intersect: true }, true);
         if (!points.length) {
           return;
         }
@@ -31,7 +31,7 @@ export class MedalChartService {
         if (typeof countryName === 'string') {
           onClick(countryName);
         }
-      }
+      };
     }
     return chart;
   };
