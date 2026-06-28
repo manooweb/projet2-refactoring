@@ -75,7 +75,8 @@ export class DashboardComponent implements OnInit {
         }],
       },
       options: {
-        aspectRatio: 2.5,
+        responsive: true,
+        maintainAspectRatio: false,
         onClick: (e) => {
           if (e.native) {
             const points = pieChart.getElementsAtEventForMode(e.native, 'point', { intersect: true }, true)
