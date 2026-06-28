@@ -9,7 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from "../components/header/header.component";
 import { KpiList } from '../components/kpi-list/kpi.model';
 import { MedalChartComponent } from '../components/medal-chart/medal-chart.component';
-import { MedalChartService } from '../serices/medal-chart.service';
+import { MedalChartService } from '../services/medal-chart.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,15 +36,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.olympics$ = this.dataService.getAllOlympics().pipe(
       tap((olympics: Olympic[]) => {
         if (olympics.length > 0) {
-          const countries: string[] = olympics.map((i: Olympic) => i.country);
-          const medals = olympics.map((i: Olympic) => i.participations.map(i => i.medalsCount));
-          const sumOfAllMedalsYears = medals.map((i) => i.reduce((acc, i) => acc + i, 0));
-          const chartData: ChartConfiguration = this.buildChartData(countries, sumOfAllMedalsYears);
+          const countryNames: string[] = olympics.map((country: Olympic) => country.country);
+          const medals = olympics.map((country: Olympic) => country.participations.map((participation) => participation.medalsCount));
+          const totalMedalsByCountry = medals.map((medalCounts) => medalCounts.reduce((total, count) => total + count, 0));
+          const chartData: ChartConfiguration = this.buildChartData(countryNames, totalMedalsByCountry);
           this.chart?.destroy();
           this.chart = this.medalChartService.createChart(
             this.chartId,
             chartData,
-            (countryName: string) => { this.router.navigate(['country', countryName]) }
+            (countryName: string) => { void this.router.navigate(['country', countryName]) }
           );
         }
       }),
@@ -57,7 +57,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.kpiList$ = this.olympics$.pipe(
       map((olympics: Olympic[]) => {
-        const years = olympics.flatMap((i: Olympic) => i.participations.map((f) => f.year));
+        const years = olympics.flatMap((country: Olympic) => country.participations.map((participation) => participation.year));
 
         return {
           title: 'Medals per Country',
@@ -79,15 +79,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.chart?.destroy();
   }
-  
-  private buildChartData(countries: string[], sumOfAllMedalsYears: number[]): ChartConfiguration {
+
+  private buildChartData(countryNames: string[], totalMedalsByCountry: number[]): ChartConfiguration {
     return {
       type: 'pie',
       data: {
-        labels: countries,
+        labels: countryNames,
         datasets: [{
           label: 'Medals',
-          data: sumOfAllMedalsYears,
+          data: totalMedalsByCountry,
           backgroundColor: ['#0b868f', '#adc3de', '#7a3c53', '#8f6263', '#E69500'],
           hoverOffset: 4
         }],
