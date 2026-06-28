@@ -7,7 +7,7 @@ import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { HeaderComponent } from '../components/header/header.component';
-import { HeaderData } from '../components/header/header-data.model';
+import { KpiList } from '../components/kpi-list/kpi.model';
 import { BackButtonComponent } from "../components/back-button/back-button.component";
 
 
@@ -26,7 +26,7 @@ export class CountryDetailComponent implements OnInit {
   private readonly dataService = inject(DataService);
   private readonly route = inject(ActivatedRoute);
 
-  headerData$!: Observable<HeaderData>;
+  kpiList$!: Observable<KpiList>;
   lineChart!: Chart<"line", number[], number>;
   error!: string;
 
@@ -48,7 +48,7 @@ export class CountryDetailComponent implements OnInit {
       shareReplay(1)
     );
 
-    this.headerData$ = selectedCountry$.pipe(
+    this.kpiList$ = selectedCountry$.pipe(
       map((selectedCountry: Olympic | undefined) => {
 
         return {

@@ -2,20 +2,5 @@
   <div class="header-container">
     <h1><a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Olympic Games</a></h1>
   </div>
-  @if (headerData) {
-    <div class="header-page">
-      <h2>{{ headerData.title }}</h2>
-    </div>
-  }
-
-  @if (headerData?.kpis; as  kpis) {
-    <div class="header-kpi-list">
-    @for (kpi of kpis; track kpi.label) {
-      <div class="kpi-card">
-        <h3>{{ kpi.label }}</h3>
-        <p>{{ kpi.value }}</p>
-      </div>
-    }
-  </div>
-  }
+  <app-kpi-list [kpiList]="kpiList" />
 </header>

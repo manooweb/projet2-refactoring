@@ -1,5 +1,5 @@
-@if (headerData$ | async; as headerData) {
-  <app-header [headerData]="headerData" />
+@if (kpiList$ | async; as kpiList) {
+  <app-header [kpiList]="kpiList" />
 }
 <main>
   <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
