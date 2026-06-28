@@ -8,19 +8,25 @@ import { AsyncPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from "../components/header/header.component";
 import { KpiList } from '../components/kpi-list/kpi.model';
+import { MedalChartComponent } from '../components/medal-chart/medal-chart.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [AsyncPipe, HeaderComponent]
+  imports: [
+    AsyncPipe,
+    HeaderComponent,
+    MedalChartComponent
+  ]
 })
 export class DashboardComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dataService = inject(DataService);
   private olympics$!: Observable<Olympic[]>;
   kpiList$!: Observable<KpiList>;
+  chartId = 'DashboardPieChart';
   pieChart!: Chart<"pie", number[], string>;
   error!: string
 
@@ -63,7 +69,7 @@ export class DashboardComponent implements OnInit {
   }
 
   buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
-    const pieChart = new Chart("DashboardPieChart", {
+    const pieChart = new Chart(this.chartId, {
       type: 'pie',
       data: {
         labels: countries,
@@ -76,7 +82,6 @@ export class DashboardComponent implements OnInit {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
         onClick: (e) => {
           if (e.native) {
             const points = pieChart.getElementsAtEventForMode(e.native, 'point', { intersect: true }, true)

@@ -2,7 +2,8 @@
 <app-header [kpiList]="kpiList" />
 }
 <main>
-  <div class="chart-container">
-    <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
-  </div>
+  <app-medal-chart
+    [canvasId]="chartId"
+    label="Pie chart showing medals by country"
+    chartType="pie"/>
 </main>
