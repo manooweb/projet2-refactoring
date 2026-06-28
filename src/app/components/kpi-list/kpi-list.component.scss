@@ -19,3 +19,11 @@
   margin: 0;
   padding: 0;
 }
+
+@media screen and (max-width: 767px) {
+  .kpi-list {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 16px;
+  }
+}
