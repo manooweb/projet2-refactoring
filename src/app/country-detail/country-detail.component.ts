@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import Chart from 'chart.js/auto';
+import Chart, { ChartConfiguration } from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
@@ -10,6 +10,7 @@ import { HeaderComponent } from '../components/header/header.component';
 import { KpiList } from '../components/kpi-list/kpi.model';
 import { BackButtonComponent } from "../components/back-button/back-button.component";
 import { MedalChartComponent } from "../components/medal-chart/medal-chart.component";
+import { MedalChartService } from '../serices/medal-chart.service';
 
 
 @Component({
@@ -24,13 +25,14 @@ import { MedalChartComponent } from "../components/medal-chart/medal-chart.compo
     MedalChartComponent
 ]
 })
-export class CountryDetailComponent implements OnInit {
+export class CountryDetailComponent implements OnInit, OnDestroy {
   private readonly dataService = inject(DataService);
+  private readonly medalChartService = inject(MedalChartService);
   private readonly route = inject(ActivatedRoute);
 
   kpiList$!: Observable<KpiList>;
   chartId = 'countryChart';
-  lineChart!: Chart<"line", number[], number>;
+  chart!: Chart;
   error!: string;
 
   ngOnInit() {
@@ -41,7 +43,12 @@ export class CountryDetailComponent implements OnInit {
         if (selectedCountry) {
           const years = selectedCountry.participations.map(i => i.year) ?? [];
           const medals = selectedCountry.participations.map(i => i.medalsCount) ?? [];
-          this.buildChart(years, medals);
+          const chartData: ChartConfiguration = this.buildChartData(years, medals);
+          this.chart?.destroy();
+          this.chart = this.medalChartService.createChart(
+            this.chartId,
+            chartData
+          );
         }
       }),
       catchError((error: HttpErrorResponse) => {
@@ -75,8 +82,12 @@ export class CountryDetailComponent implements OnInit {
     );
   }
 
-  buildChart(years: number[], medals: number[]) {
-    const lineChart = new Chart(this.chartId, {
+  ngOnDestroy(): void {
+    this.chart?.destroy();
+  }
+
+  private buildChartData(years: number[], medals: number[]): ChartConfiguration {
+    return {
       type: 'line',
       data: {
         labels: years,
@@ -88,10 +99,6 @@ export class CountryDetailComponent implements OnInit {
           },
         ]
       },
-      options: {
-        responsive: true,
-      }
-    });
-    this.lineChart = lineChart;
+    };
   }
 }
