@@ -4,23 +4,23 @@ import Chart from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from "../components/header/header.component";
-import { HeaderData } from '../components/header/header-data.model';
+import { KpiList } from '../components/kpi-list/kpi.model';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [AsyncPipe, HeaderComponent, NgClass]
+  imports: [AsyncPipe, HeaderComponent]
 })
 export class DashboardComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dataService = inject(DataService);
   private olympics$!: Observable<Olympic[]>;
-  headerData$!: Observable<HeaderData>;
+  kpiList$!: Observable<KpiList>;
   pieChart!: Chart<"pie", number[], string>;
   error!: string
 
@@ -41,7 +41,7 @@ export class DashboardComponent implements OnInit {
       shareReplay(1)
     );
 
-    this.headerData$ = this.olympics$.pipe(
+    this.kpiList$ = this.olympics$.pipe(
       map((olympics: Olympic[]) => {
         const years = olympics.flatMap((i: Olympic) => i.participations.map((f) => f.year));
 

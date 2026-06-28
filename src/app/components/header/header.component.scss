@@ -7,51 +7,6 @@ header {
     padding: 10px;
   }
 
-  .header-page {
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-
-    h2 {
-      background: #0b868f;
-      padding: 10px;
-      border-radius: 10px;
-      color: white;
-    }
-  }
-
-  .header-kpi-list {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-
-    .kpi-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-sizing: border-box;
-      margin: 5px;
-      padding: 10px 20px;
-      box-shadow: lightgray 4px 4px 5px;
-      border: solid #0b868f 1px;
-      border-radius: 10px;
-      color: gray;
-      gap: 10px;
-
-      h3 {
-        margin-bottom: 10px;
-      }
-
-      p:last-child {
-        font-weight: bold;
-        color: black;
-      }
-    }
-  }
-
   a {
     margin: 0 10px;
     color: #777;

@@ -1,18 +1,20 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { HeaderData } from './header-data.model';
+import { KpiList } from '../kpi-list/kpi.model';
+import { KpiListComponent } from "../kpi-list/kpi-list.component";
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
     RouterLink,
-    RouterLinkActive
-  ],
+    RouterLinkActive,
+    KpiListComponent
+],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  @Input() headerData?: HeaderData;
+  @Input() kpiList?: KpiList;
 
 }
