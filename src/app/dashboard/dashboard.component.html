@@ -1,6 +1,8 @@
 @if (kpiList$ | async; as kpiList) {
-  <app-header [kpiList]="kpiList" />
+<app-header [kpiList]="kpiList" />
 }
 <main>
-  <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
+  <div class="chart-container">
+    <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
+  </div>
 </main>
