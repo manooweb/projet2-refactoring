@@ -5,5 +5,5 @@ export interface HeaderData {
 
 export interface HeaderKpi {
   readonly label: string;
-  readonly value: number | string;
+  readonly value: number;
 }
