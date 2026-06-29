@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
@@ -28,6 +28,7 @@ import { MedalChartService } from '../services/medal-chart.service';
 export class CountryDetailComponent implements OnInit, OnDestroy {
   private readonly dataService = inject(DataService);
   private readonly medalChartService = inject(MedalChartService);
+  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   kpiList$!: Observable<KpiList>;
@@ -40,16 +41,18 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
 
     const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
       tap((selectedCountry: Olympic | undefined) => {
-        if (selectedCountry) {
-          const participationYears = selectedCountry.participations.map(participation => participation.year) ?? [];
-          const medalCounts = selectedCountry.participations.map(participation => participation.medalsCount) ?? [];
-          const chartData: ChartConfiguration = this.buildChartData(participationYears, medalCounts);
-          this.chart?.destroy();
-          this.chart = this.medalChartService.createChart(
-            this.chartId,
-            chartData
-          );
+        if (!selectedCountry) {
+          this.router.navigate(['/not-found'],{ queryParams: { errorMessage: `Country "${countryName}" not found` }});
+          return;
         }
+        const participationYears = selectedCountry.participations.map(participation => participation.year) ?? [];
+        const medalCounts = selectedCountry.participations.map(participation => participation.medalsCount) ?? [];
+        const chartData: ChartConfiguration = this.buildChartData(participationYears, medalCounts);
+        this.chart?.destroy();
+        this.chart = this.medalChartService.createChart(
+          this.chartId,
+          chartData
+        );
       }),
       catchError((error: HttpErrorResponse) => {
         this.error = error.message;
