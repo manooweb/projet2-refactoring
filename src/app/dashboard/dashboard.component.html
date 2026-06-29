@@ -1,9 +1,13 @@
 @if (kpiList$ | async; as kpiList) {
-<app-header [kpiList]="kpiList" />
+  <app-header [kpiList]="kpiList" [error]="errorMessage"/>
 }
 <main>
-  <app-medal-chart
-    [canvasId]="chartId"
-    label="Pie chart showing medals by country"
-    chartType="pie"/>
+  @if (!errorMessage) {
+    <app-medal-chart
+      [canvasId]="chartId"
+      label="Pie chart showing medals by country"
+      chartType="pie"/>
+  } @else {
+    <app-error [errorMessage]="errorMessage" [actionMessage]="actionMessage" [isBackButton]="false" />
+  }
 </main>

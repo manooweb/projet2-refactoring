@@ -1,10 +1,14 @@
 @if (kpiList$ | async; as kpiList) {
-  <app-header [kpiList]="kpiList" />
+  <app-header [kpiList]="kpiList" [error]="errorMessage" />
 }
 <main>
-  <app-medal-chart
-   [canvasId]="chartId"
-   label="Line chart showing country medals by Olympic participation year"
-   chartLegend="Dates" />
-  <app-back-button />
+  @if (!errorMessage) {
+    <app-medal-chart
+    [canvasId]="chartId"
+    label="Line chart showing country medals by Olympic participation year"
+    chartLegend="Dates" />
+    <app-back-button />
+  } @else {
+    <app-error [errorMessage]="errorMessage" [actionMessage]="actionMessage" [isBackButton]="true" />
+  }
 </main>

@@ -16,5 +16,6 @@ import { KpiListComponent } from "../kpi-list/kpi-list.component";
 })
 export class HeaderComponent {
   @Input() kpiList?: KpiList;
+  @Input() error?: string;
 
 }
