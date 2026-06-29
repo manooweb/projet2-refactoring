@@ -1,7 +1,9 @@
-@if (kpiList$ | async; as kpiList) {
-  <app-header [kpiList]="kpiList" [error]="errorMessage"/>
-}
+<app-header [kpiList]="(kpiList$ | async) ?? undefined" [error]="errorMessage"/>
 <main>
+  @if(loading()) {
+    <app-loading-spinner/>
+  }
+
   @if (!errorMessage) {
     <app-medal-chart
       [canvasId]="chartId"
@@ -9,5 +11,5 @@
       chartType="pie"/>
   } @else {
     <app-error [errorMessage]="errorMessage" [actionMessage]="actionMessage" [isBackButton]="false" />
-  }
+}
 </main>
