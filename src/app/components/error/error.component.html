@@ -1,0 +1,9 @@
+<div class="app-error">
+  <h2>{{ errorMessage }}</h2>
+  @if (actionMessage) {
+    <p>{{ actionMessage }}</p>
+  }
+  @if (isBackButton) {
+    <app-back-button />
+  }
+</div>

@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
@@ -11,6 +10,7 @@ import { KpiList } from '../components/kpi-list/kpi.model';
 import { BackButtonComponent } from "../components/back-button/back-button.component";
 import { MedalChartComponent } from "../components/medal-chart/medal-chart.component";
 import { MedalChartService } from '../services/medal-chart.service';
+import { ErrorComponent } from '../components/error/error.component';
 
 
 @Component({
@@ -22,7 +22,8 @@ import { MedalChartService } from '../services/medal-chart.service';
     AsyncPipe,
     HeaderComponent,
     BackButtonComponent,
-    MedalChartComponent
+    MedalChartComponent,
+    ErrorComponent
 ]
 })
 export class CountryDetailComponent implements OnInit, OnDestroy {
@@ -34,7 +35,8 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
   kpiList$!: Observable<KpiList>;
   chartId = 'countryChart';
   chart!: Chart;
-  error!: string;
+  errorMessage!: string;
+  actionMessage!: string;
 
   ngOnInit() {
     const countryName = this.route.snapshot.params['countryName'];
@@ -54,8 +56,9 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
           chartData
         );
       }),
-      catchError((error: HttpErrorResponse) => {
-        this.error = error.message;
+      catchError(() => {
+        this.errorMessage = 'An technical error occurred';
+        this.actionMessage = 'Please try again later or contact support if the problem persists.';
         return of(undefined);
       }),
       shareReplay(1)

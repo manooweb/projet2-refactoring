@@ -5,11 +5,11 @@ import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
 import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from "../components/header/header.component";
 import { KpiList } from '../components/kpi-list/kpi.model';
 import { MedalChartComponent } from '../components/medal-chart/medal-chart.component';
 import { MedalChartService } from '../services/medal-chart.service';
+import { ErrorComponent } from '../components/error/error.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +19,8 @@ import { MedalChartService } from '../services/medal-chart.service';
   imports: [
     AsyncPipe,
     HeaderComponent,
-    MedalChartComponent
+    MedalChartComponent,
+    ErrorComponent
   ]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -30,7 +31,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   kpiList$!: Observable<KpiList>;
   chartId = 'DashboardPieChart';
   chart!: Chart;
-  error!: string
+  errorMessage!: string;
+  actionMessage!: string;
 
   ngOnInit() {
     this.olympics$ = this.dataService.getAllOlympics().pipe(
@@ -48,8 +50,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           );
         }
       }),
-      catchError((error: HttpErrorResponse) => {
-        this.error = error.message;
+      catchError(() => {
+        this.errorMessage = 'An technical error occurred';
+        this.actionMessage = 'Please try again later or contact support if the problem persists.';
         return of([]);
       }),
       shareReplay(1)

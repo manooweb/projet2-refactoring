@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HeaderComponent } from '../components/header/header.component';
-import { BackButtonComponent } from '../components/back-button/back-button.component';
 import { ActivatedRoute } from '@angular/router';
+import { ErrorComponent } from '../components/error/error.component';
 
 @Component({
     selector: 'app-not-found',
@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
     standalone: true,
     imports: [
       HeaderComponent,
-      BackButtonComponent
+      ErrorComponent
     ]
 })
 

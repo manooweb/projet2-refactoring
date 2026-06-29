@@ -2,5 +2,7 @@
   <div class="header-container">
     <h1><a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Olympic Games</a></h1>
   </div>
-  <app-kpi-list [kpiList]="kpiList" />
+  @if (!error) {
+    <app-kpi-list [kpiList]="kpiList" />
+  }
 </header>
