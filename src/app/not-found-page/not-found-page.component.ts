@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { HeaderComponent } from '../components/header/header.component';
 import { BackButtonComponent } from '../components/back-button/back-button.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-not-found',
@@ -13,5 +14,13 @@ import { BackButtonComponent } from '../components/back-button/back-button.compo
     ]
 })
 
-export class NotFoundPageComponent {
+export class NotFoundPageComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  
+  errorMessage = 'No corresponding page found';
+
+  ngOnInit() {
+    this.errorMessage =
+      this.route.snapshot.queryParamMap.get('errorMessage') ?? this.errorMessage;
+  }
 }
