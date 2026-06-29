@@ -1,9 +1,9 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
 import { DataService } from '../services/data.service';
-import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
+import { catchError, finalize, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { HeaderComponent } from '../components/header/header.component';
 import { KpiList } from '../components/kpi-list/kpi.model';
@@ -11,6 +11,7 @@ import { BackButtonComponent } from "../components/back-button/back-button.compo
 import { MedalChartComponent } from "../components/medal-chart/medal-chart.component";
 import { MedalChartService } from '../services/medal-chart.service';
 import { ErrorComponent } from '../components/error/error.component';
+import { LoadingSpinnerComponent } from '../components/loading-spinner/loading-spinner.component';
 
 
 @Component({
@@ -23,7 +24,9 @@ import { ErrorComponent } from '../components/error/error.component';
     HeaderComponent,
     BackButtonComponent,
     MedalChartComponent,
-    ErrorComponent
+    ErrorComponent,
+    LoadingSpinnerComponent
+
 ]
 })
 export class CountryDetailComponent implements OnInit, OnDestroy {
@@ -37,6 +40,8 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
   chart!: Chart;
   errorMessage!: string;
   actionMessage!: string;
+
+  loading = signal(true);
 
   ngOnInit() {
     const countryName = this.route.snapshot.params['countryName'];
@@ -84,6 +89,9 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
             }
           ]
         };
+      }),
+      finalize(() => {
+        this.loading.set(false);
       })
     );
   }
