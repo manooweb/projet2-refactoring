@@ -12,7 +12,7 @@ import { BackButtonComponent } from '../back-button/back-button.component';
 })
 export class ErrorComponent {
   @Input() errorMessage!: string;
-  @Input() actionMessage!: string;
+  @Input() actionMessage?: string;
   @Input() isBackButton = true;
 
 }
