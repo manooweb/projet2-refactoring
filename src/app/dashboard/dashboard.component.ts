@@ -11,6 +11,7 @@ import { MedalChartComponent } from '../components/medal-chart/medal-chart.compo
 import { MedalChartService } from '../services/medal-chart.service';
 import { ErrorComponent } from '../components/error/error.component';
 import { LoadingSpinnerComponent } from '../components/loading-spinner/loading-spinner.component';
+import { ERROR_MESSAGES } from '../constants/error-messages';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,22 +42,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.olympics$ = this.dataService.getAllOlympics().pipe(
       tap((olympics: Olympic[]) => {
-        if (olympics.length > 0) {
-          const countryNames: string[] = olympics.map((country: Olympic) => country.country);
-          const medals = olympics.map((country: Olympic) => country.participations.map((participation) => participation.medalsCount));
-          const totalMedalsByCountry = medals.map((medalCounts) => medalCounts.reduce((total, count) => total + count, 0));
-          const chartData: ChartConfiguration = this.buildChartData(countryNames, totalMedalsByCountry);
-          this.chart?.destroy();
-          this.chart = this.medalChartService.createChart(
-            this.chartId,
-            chartData,
-            (countryName: string) => { void this.router.navigate(['country', countryName]) }
-          );
+        if (olympics.length === 0) {
+          this.setTechnicalError();
+          return;
         }
+
+        const countryNames: string[] = olympics.map((country: Olympic) => country.country);
+        const medals = olympics.map((country: Olympic) => country.participations.map((participation) => participation.medalsCount));
+        const totalMedalsByCountry = medals.map((medalCounts) => medalCounts.reduce((total, count) => total + count, 0));
+        const chartData: ChartConfiguration = this.buildChartData(countryNames, totalMedalsByCountry);
+        this.chart?.destroy();
+        this.chart = this.medalChartService.createChart(
+          this.chartId,
+          chartData,
+          (countryName: string) => { void this.router.navigate(['country', countryName]) }
+        );
       }),
       catchError(() => {
-        this.errorMessage = 'A technical error occurred';
-        this.actionMessage = 'Please try again later or contact support if the problem persists.';
+        this.setTechnicalError();
         return of([]);
       }),
       shareReplay(1)
@@ -103,5 +106,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }],
       },
     };
+  }
+
+  private setTechnicalError(): void {
+    this.errorMessage = ERROR_MESSAGES.technical.title;
+    this.actionMessage = ERROR_MESSAGES.technical.action;
   }
 }

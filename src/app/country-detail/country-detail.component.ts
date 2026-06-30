@@ -12,6 +12,7 @@ import { MedalChartComponent } from "../components/medal-chart/medal-chart.compo
 import { MedalChartService } from '../services/medal-chart.service';
 import { ErrorComponent } from '../components/error/error.component';
 import { LoadingSpinnerComponent } from '../components/loading-spinner/loading-spinner.component';
+import { ERROR_MESSAGES } from '../constants/error-messages';
 
 
 @Component({
@@ -49,7 +50,7 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
     const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
       tap((selectedCountry: Olympic | undefined) => {
         if (!selectedCountry) {
-          this.router.navigate(['/not-found'],{ queryParams: { errorMessage: `Country "${countryName}" not found` }});
+          this.router.navigate(['/not-found'],{ queryParams: { errorMessage: ERROR_MESSAGES.countryNotFound(countryName) }});
           return;
         }
         const participationYears = selectedCountry.participations.map(participation => participation.year) ?? [];
@@ -62,8 +63,7 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
         );
       }),
       catchError(() => {
-        this.errorMessage = 'A technical error occurred';
-        this.actionMessage = 'Please try again later or contact support if the problem persists.';
+        this.setTechnicalError();
         return of(undefined);
       }),
       shareReplay(1)
@@ -114,5 +114,10 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
         ]
       },
     };
+  }
+
+  private setTechnicalError(): void {
+    this.errorMessage = ERROR_MESSAGES.technical.title;
+    this.actionMessage = ERROR_MESSAGES.technical.action;
   }
 }
