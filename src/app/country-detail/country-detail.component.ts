@@ -50,7 +50,7 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
     const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
       tap((selectedCountry: Olympic | undefined) => {
         if (!selectedCountry) {
-          this.router.navigate(['/not-found'],{ queryParams: { errorMessage: ERROR_MESSAGES.countryNotFound(countryName) }});
+          void this.router.navigate(['/not-found'],{ queryParams: { errorMessage: ERROR_MESSAGES.countryNotFound(countryName) }});
           return;
         }
         const participationYears = selectedCountry.participations.map(participation => participation.year) ?? [];
