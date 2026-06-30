@@ -1,6 +1,6 @@
 export interface KpiList {
   readonly title: string;
-  readonly kpis?: Kpi[];
+  readonly kpis: Kpi[];
 }
 
 export interface Kpi {
