@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { HeaderComponent } from '../components/header/header.component';
 import { ActivatedRoute } from '@angular/router';
 import { ErrorComponent } from '../components/error/error.component';
+import { ERROR_MESSAGES } from '../constants/error-messages';
 
 @Component({
     selector: 'app-not-found',
@@ -17,7 +18,7 @@ import { ErrorComponent } from '../components/error/error.component';
 export class NotFoundPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   
-  errorMessage = 'No corresponding page found';
+  errorMessage: string = ERROR_MESSAGES.pageNotFound;
 
   ngOnInit() {
     this.errorMessage =
