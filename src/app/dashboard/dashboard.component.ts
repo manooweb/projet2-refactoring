@@ -55,7 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       }),
       catchError(() => {
-        this.errorMessage = 'An technical error occurred';
+        this.errorMessage = 'A technical error occurred';
         this.actionMessage = 'Please try again later or contact support if the problem persists.';
         return of([]);
       }),
