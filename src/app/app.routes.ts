@@ -14,6 +14,10 @@ export const routes: Routes = [
     component: CountryDetailComponent,
   },
   {
+    path: 'not-found',
+    component: NotFoundPageComponent,
+  },
+  {
     path: '**',
     component: NotFoundPageComponent,
   },
