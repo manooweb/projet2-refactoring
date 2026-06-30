@@ -1,106 +1,156 @@
-# Notes d'architecture
+# Architecture
 
-| Categorie | Zone | Point verifie | Resultat | Probleme identifie | Commentaire personnel | Priorite |
-| --- | --- | --- | --- | --- | --- | --- |
-| Application | build | ng serve | ✅ | - | l'application build et démarre correctement | ❌
-| Application | test | ng test | ❌ | un première test ne passe pas car une propriété du composant AppComponent n'existe pas | Même en corrigeant il y a un problème pour exécuter les tests | ⬇️
-| Application | lint | ng lint | ❌ | le linter n'est pas installé | Il pourrait déjà permettre d'identifier des anomalies potentielles. Il y a déjà un certain nombre d'erreurs qui doivent être corrigées. A mon avis elles doivent être corrigées une fois la migration vers des composents standalone effectuée. | ⬆️
-| Architecture | Composant | @NgModules | ❌ | Ce n'est plus l'architecture recommandée | Il faudra profiter du refactoring pour passer en architecture composant Standalone. Cela facilitera grandement des migrations vers des version plus récentes d'Angular. | ⬆️
-| Données | assets | code | ✅ | Présence du fichier JSON servant de base de données dans un sous-dossier d'assets accessible publiquement | Les données ne doivent pas être accessibles directement. Finalement c'est ok, l'accès doit simuler l'accès publique à une API via HTTP. On conserve ce fichier dans ce dossier | ✅
-| Données | Modèles | spécifications | ❌ | les spécifications concernants les types de données ne sont pas respectées. Cela entraîne une utilisation trop important de typage laxiste 'any'. Cela ne tient pas compte des contraintes non fonctionnelles des spécifications | Il faut donc implementer les interface de typage réprésentant les données | ➡️
-| Données | Service | spécifications | ❌ | Aucun service implémenté contrairement aux spécifications. L'accès aux données se fait directement dans les composents | Implémenter le service et éviter les appels HTTP direct dans les composents. Centraliser dans le service | ⬆️ |
-| Layout | Header | Spécifications | ❌ | Le composent n'existe pas. Comme il n'existe pas il n'est pas appliqué sur l'ensemble des pages CountryDetailPage et NotFound. Cela entraîne une incohérence entre les pages | Créer le composent l'appliquer sur l'ensemble des pages | ⬆️
-| Layout | Header | spécifications | ❌ | Selon moi il manque un lien sur le titre de l'application pour faciliter le retour à la page d'accueil | A rectifier | ➡️
-| Layout | Header | spécifications | ❌ | Le header est dupliqué et ne respecte pas les spécifications. Il doit être réutilisable et paramétrable pour l'utiliser sur les différentes pages | Se conformer aux spécfications | ⬆️
-| Attente |  | spécifications + code | ❌ | Aucune gestion d'un délai d'attente sur l'accès aux données | Il faut que l'utilisateur soit conscient qu'un traitement est en cours pour le faire patienter | ➡️
-| Qualité |  | spécifications + code | ❌ | Il existe des console.log() dont un qui afficher la toalité des données récupérées. Celui pour l'affichage d'une erreur de récupération des données est utile pour le debug mais devrait être simplifié pour l'affichage à l'utilisateur | A supprimer | ⬆️
-| Gestion d'erreur |  | spécifications + code | ❌ | aucun affichage d'erreur explicite en cas de problème d'accès aux données ou de données vide | Afficher les erreurs utile à l'utilisateur | ⬆️
-| Routing | Page not found | code | ❌ | Path pour cette route inutile | A supprimer | ⬇️
-| Routing | country | code | ❌ | Nom du pays pour accéder à la page de détail d'un pays. Utilisation de subscribe pour récupére le nom du pays dans l'URL dans le composent de détails du pays. | Utiliser ActivedRoute pour simplifer le passage de paramètre dans l'URL et utiliser plutôt l'id du pays | ⬆️
-| Composent |  | code | ❌ | Les graphes sont construits dnas les composents | Factorisation de la construction des graphes dans les composents | ➡️
-| Styles |  | code | ❌ | Styles parfois trop globaux en partie lié au fait qu'il n'y ait pas de composent Header | A mieux découper en fonction des composents. Améliorer l'aspect général du rendu de l'app | ➡️
-| Styles | Responsive | spécifications + code | ❌ | Le responsive n'est pas totalement respecté | Respecter les  |
-| A11y |  | spécifications + code | ❌ | il n'y a pas d'icone ou bouton donc pas d'accessibilié à gérer. | Par contre, il y a sans doute de l'accessilibité à gérer pour le canvas nécessaire à l'affichage des graphes. S'informer sur ce qu'il est possible de faire dans Chart.js pour mieux gérer l'accessibilité aux quatiers de camembert par exemple sur dashboard | ➡️
-| Documentation | README.md | fichier | ❌ | La documentation de démarrage du projet me parait un peu légère : pas de pré-requis, manque de précision sur la manière de démarrer le projet | A améliorer | ⬇️
+Ce document décrit l'organisation front-end de l'application Olympic Games après refactoring.
 
-## Arborescence proposée
+## Objectif
 
-```mermaid
-flowchart TD
-  app["src/app/"]
+L'application affiche des statistiques olympiques à partir d'un jeu de données local. Le refactoring a eu pour objectif de clarifier l'organisation du code, de centraliser l'accès aux données, de renforcer le typage TypeScript et de découper l'interface en composants réutilisables.
 
-  app --> dashboardFolder["dashboard/"]
-  dashboardFolder --> dashboard["DashboardComponent"]
+## Vue d'ensemble
 
-  app --> countryFolder["country-detail/"]
-  countryFolder --> countryDetail["CountryDetailComponent"]
+L'application repose sur une architecture Angular avec composants standalone. Les anciennes pages ont été remplacées par des composants de page dédiés :
 
-  app --> componentsFolder["components/"]
-  componentsFolder --> header["HeaderComponent"]
+- `DashboardComponent` pour la page d'accueil ;
+- `CountryDetailComponent` pour la page de détail d'un pays ;
+- `NotFoundPageComponent` pour les routes inconnues et les pays inexistants.
 
-  app --> servicesFolder["services/"]
-  servicesFolder --> dataService["DataService"]
+Les composants de page orchestrent l'affichage, mais les responsabilités communes sont déplacées dans des services ou des composants réutilisables.
 
-  app --> modelsFolder["models/"]
-  modelsFolder --> olympic["Olympic"]
-  modelsFolder --> participation["Participation"]
-
-  assetsMock["src/assets/mock/"]
-  assetsMock --> json["olympic-data.json"]
-
-  routes["app.routes.ts"]
-
-  routes -. "route /" .-> dashboard
-  routes -. "route /country/:id" .-> countryDetail
-
-  dashboard -->|inclut| header
-  countryDetail -->|inclut| header
-
-  dashboard -->|injecte| dataService
-  countryDetail -->|injecte| dataService
-  dataService -->|HttpClient| json
-
-  classDef folder fill:#eef2ff,stroke:#4f46e5,stroke-width:1px,color:#111827;
-  classDef component fill:#ecfdf5,stroke:#059669,stroke-width:1px,color:#064e3b;
-  classDef service fill:#fff7ed,stroke:#ea580c,stroke-width:1px,color:#7c2d12;
-  classDef model fill:#fdf2f8,stroke:#db2777,stroke-width:1px,color:#831843;
-  classDef data fill:#f8fafc,stroke:#475569,stroke-width:1px,color:#0f172a;
-  classDef routing fill:#fefce8,stroke:#ca8a04,stroke-width:1px,color:#713f12;
-
-  class app,dashboardFolder,countryFolder,componentsFolder,servicesFolder,modelsFolder,assetsMock folder;
-  class dashboard,countryDetail,header component;
-  class dataService service;
-  class olympic,participation model;
-  class json data;
-  class routes routing;
-```
+## Organisation des dossiers
 
 ```text
 src/
 ├── app/
 │   ├── components/
-│   │   └── header/
-│   │       └── header.component.ts
+│   │   ├── back-button/
+│   │   ├── error/
+│   │   ├── header/
+│   │   ├── kpi-card/
+│   │   ├── kpi-list/
+│   │   ├── loading-spinner/
+│   │   └── medal-chart/
+│   ├── constants/
+│   │   └── error-messages.ts
 │   ├── country-detail/
-│   │   └── country-detail.component.ts
 │   ├── dashboard/
-│   │   └── dashboard.component.ts
 │   ├── models/
-│   │   ├── olympic.ts
-│   │   └── participation.ts
+│   │   └── olympic.model.ts
+│   ├── not-found-page/
 │   ├── services/
-│   │   └── data.service.ts
+│   │   ├── data.service.ts
+│   │   └── medal-chart.service.ts
 │   └── app.routes.ts
 └── assets/
     └── mock/
-        └── olympic-data.json
+        └── olympic.json
 ```
 
-Le fichier JSON reste placé dans `src/assets/mock/` afin de simuler une source de données externe. Son accès reste centralisé dans `DataService` via `HttpClient`, ce qui permettra de remplacer plus facilement ce mock par une vraie API backend par la suite.
+## Routing
 
+Les routes sont définies dans `src/app/app.routes.ts`.
 
+| Route | Composant | Rôle |
+| --- | --- | --- |
+| `/` | `DashboardComponent` | Affiche le tableau de bord global. |
+| `/country/:countryName` | `CountryDetailComponent` | Affiche les statistiques d'un pays. |
+| `/not-found` | `NotFoundPageComponent` | Affiche une erreur de navigation ou de pays inconnu. |
+| `**` | `NotFoundPageComponent` | Gère les routes inconnues. |
 
+Le pays sélectionné est transmis dans l'URL avec son nom. La page de détail récupère ce paramètre via `ActivatedRoute`.
 
+## Accès aux données
 
+L'accès aux données est centralisé dans `DataService`.
 
+```text
+DashboardComponent / CountryDetailComponent
+        ↓
+DataService
+        ↓
+HttpClient
+        ↓
+src/assets/mock/olympic.json
+```
 
+Le fichier `src/assets/mock/olympic.json` sert de source de données locale. Il simule une réponse HTTP et pourra être remplacé plus tard par une vraie API sans modifier directement les composants de page.
+
+Le service expose deux méthodes principales :
+
+- `getAllOlympics()` pour récupérer l'ensemble des données ;
+- `getCountryByName(countryName)` pour récupérer un pays à partir du nom présent dans l'URL.
+
+## Typage
+
+Les données olympiques sont décrites dans `src/app/models/olympic.model.ts`.
+
+```ts
+export interface Participation {
+  id: number,
+  year: number,
+  city: string,
+  medalsCount: number,
+  athleteCount: number
+}
+
+export interface Olympic {
+  id: number,
+  country: string,
+  participations: Participation[]
+}
+```
+
+Ces interfaces évitent l'utilisation de `any` dans les traitements liés aux pays, aux participations, aux médailles et aux athlètes.
+
+## Composants réutilisables
+
+Les éléments communs de l'interface sont placés dans `src/app/components`.
+
+| Composant | Rôle |
+| --- | --- |
+| `HeaderComponent` | Affiche le titre de l'application et les KPI de la page quand ils existent. |
+| `KpiListComponent` | Affiche un groupe de KPI. |
+| `KpiCardComponent` | Affiche un KPI individuel. |
+| `MedalChartComponent` | Fournit le canvas utilisé par Chart.js. |
+| `BackButtonComponent` | Permet de revenir à la page dashboard. |
+| `LoadingSpinnerComponent` | Affiche un état de chargement. |
+| `ErrorComponent` | Affiche un message d'erreur et une action optionnelle. |
+
+Ce découpage limite la duplication entre les pages et rend les éléments d'interface plus faciles à faire évoluer.
+
+## Graphiques
+
+Les graphiques utilisent Chart.js.
+
+La création des instances Chart.js est centralisée dans `MedalChartService`. Les composants de page préparent les labels et les données, puis délèguent la création du graphique au service.
+
+Cette séparation permet de ne pas dupliquer la configuration Chart.js dans les pages et facilite la destruction des graphiques lors du cycle de vie Angular.
+
+## Gestion des états
+
+L'application gère plusieurs états utilisateur :
+
+- chargement des données ;
+- erreur technique lors du chargement ;
+- jeu de données global vide ;
+- pays inexistant ;
+- route inconnue.
+
+Les pages s'appuient sur RxJS, `AsyncPipe` et des observables pour limiter les souscriptions manuelles dans les composants.
+
+## Qualité et validation
+
+Le projet dispose de scripts npm pour vérifier l'application :
+
+```bash
+npm run build
+npm test
+npm run lint
+```
+
+Le linting Angular est configuré avec ESLint. Les tests unitaires sont exécutés en mode headless avec Karma et ChromeHeadless.
+
+## Limites connues
+
+L'application utilise encore un fichier JSON local au lieu d'une API backend réelle.
+
+La route de détail utilise actuellement le nom du pays dans l'URL (`/country/:countryName`). Une évolution possible serait d'utiliser l'identifiant du pays pour rendre l'URL moins dépendante du libellé affiché.
