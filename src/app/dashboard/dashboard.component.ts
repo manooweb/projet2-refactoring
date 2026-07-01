@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
@@ -26,12 +26,11 @@ import { ERROR_MESSAGES } from '../constants/error-messages';
     LoadingSpinnerComponent
   ]
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly dataService = inject(DataService);
   private readonly medalChartService = inject(MedalChartService);
-  private olympics$!: Observable<Olympic[]>;
-  kpiList$!: Observable<KpiList>;
+  // kpiList$!: Observable<KpiList>;
   chartId = 'DashboardPieChart';
   chart!: Chart;
   errorMessage!: string;
@@ -39,55 +38,53 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loading = signal(true);
 
-  ngOnInit() {
-    this.olympics$ = this.dataService.getAllOlympics().pipe(
-      tap((olympics: Olympic[]) => {
-        if (olympics.length === 0) {
-          this.setTechnicalError();
-          return;
-        }
-
-        const countryNames: string[] = olympics.map((country: Olympic) => country.country);
-        const medals = olympics.map((country: Olympic) => country.participations.map((participation) => participation.medalsCount));
-        const totalMedalsByCountry = medals.map((medalCounts) => medalCounts.reduce((total, count) => total + count, 0));
-        const chartData: ChartConfiguration = this.buildChartData(countryNames, totalMedalsByCountry);
-        this.chart?.destroy();
-        this.chart = this.medalChartService.createChart(
-          this.chartId,
-          chartData,
-          (countryName: string) => { void this.router.navigate(['country', countryName]) }
-        );
-      }),
-      catchError(() => {
+  private olympics$: Observable<Olympic[]> = this.dataService.getAllOlympics().pipe(
+    tap((olympics: Olympic[]) => {
+      if (olympics.length === 0) {
         this.setTechnicalError();
-        return of([]);
-      }),
-      shareReplay(1)
-    );
+        return;
+      }
 
-    this.kpiList$ = this.olympics$.pipe(
-      map((olympics: Olympic[]) => {
-        const years = olympics.flatMap((country: Olympic) => country.participations.map((participation) => participation.year));
+      const countryNames: string[] = olympics.map((country: Olympic) => country.country);
+      const medals = olympics.map((country: Olympic) => country.participations.map((participation) => participation.medalsCount));
+      const totalMedalsByCountry = medals.map((medalCounts) => medalCounts.reduce((total, count) => total + count, 0));
+      const chartData: ChartConfiguration = this.buildChartData(countryNames, totalMedalsByCountry);
+      this.chart?.destroy();
+      this.chart = this.medalChartService.createChart(
+        this.chartId,
+        chartData,
+        (countryName: string) => { void this.router.navigate(['country', countryName]) }
+      );
+    }),
+    catchError(() => {
+      this.setTechnicalError();
+      return of([]);
+    }),
+    shareReplay(1)
+  );
 
-        return {
-          title: 'Medals per Country',
-          kpis: [
-            {
-              label: 'Number of countries',
-              value: olympics.length
-            },
-            {
-              label: 'Number of JOs',
-              value: new Set(years).size
-            },
-          ]
-        };
-      }),
-      finalize(() => {
-        this.loading.set(false);
-      }),
-    );
-  }
+  protected kpiList$: Observable<KpiList> = this.olympics$.pipe(
+    map((olympics: Olympic[]) => {
+      const years = olympics.flatMap((country: Olympic) => country.participations.map((participation) => participation.year));
+
+      return {
+        title: 'Medals per Country',
+        kpis: [
+          {
+            label: 'Number of countries',
+            value: olympics.length
+          },
+          {
+            label: 'Number of JOs',
+            value: new Set(years).size
+          },
+        ]
+      };
+    }),
+    finalize(() => {
+      this.loading.set(false);
+    }),
+  );
 
   ngOnDestroy(): void {
     this.chart?.destroy();

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HeaderComponent } from '../components/header/header.component';
 import { ActivatedRoute } from '@angular/router';
 import { ErrorComponent } from '../components/error/error.component';
@@ -15,13 +15,8 @@ import { ERROR_MESSAGES } from '../constants/error-messages';
     ]
 })
 
-export class NotFoundPageComponent implements OnInit {
+export class NotFoundPageComponent {
   private readonly route = inject(ActivatedRoute);
-  
-  errorMessage: string = ERROR_MESSAGES.pageNotFound;
 
-  ngOnInit() {
-    this.errorMessage =
-      this.route.snapshot.queryParamMap.get('errorMessage') ?? this.errorMessage;
-  }
+  errorMessage: string = this.route.snapshot.queryParamMap.get('errorMessage') ?? ERROR_MESSAGES.pageNotFound;
 }
