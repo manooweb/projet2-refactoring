@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import { Olympic } from 'src/app/models/olympic.model';
@@ -28,15 +28,14 @@ import { ERROR_MESSAGES } from '../constants/error-messages';
     ErrorComponent,
     LoadingSpinnerComponent
 
-]
+  ]
 })
-export class CountryDetailComponent implements OnInit, OnDestroy {
+export class CountryDetailComponent implements OnDestroy {
   private readonly dataService = inject(DataService);
   private readonly medalChartService = inject(MedalChartService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  kpiList$!: Observable<KpiList>;
   chartId = 'countryChart';
   chart!: Chart;
   errorMessage!: string;
@@ -44,57 +43,55 @@ export class CountryDetailComponent implements OnInit, OnDestroy {
 
   loading = signal(true);
 
-  ngOnInit() {
-    const countryName = this.route.snapshot.params['countryName'];
+  private countryName = this.route.snapshot.params['countryName'];
 
-    const selectedCountry$ = this.dataService.getCountryByName(countryName).pipe(
-      tap((selectedCountry: Olympic | undefined) => {
-        if (!selectedCountry) {
-          void this.router.navigate(['/not-found'],{ queryParams: { errorMessage: ERROR_MESSAGES.countryNotFound(countryName) }});
-          return;
-        }
-        const participationYears = selectedCountry.participations.map(participation => participation.year) ?? [];
-        const medalCounts = selectedCountry.participations.map(participation => participation.medalsCount) ?? [];
-        const chartData: ChartConfiguration = this.buildChartData(participationYears, medalCounts);
-        this.chart?.destroy();
-        this.chart = this.medalChartService.createChart(
-          this.chartId,
-          chartData
-        );
-      }),
-      catchError(() => {
-        this.setTechnicalError();
-        return of(undefined);
-      }),
-      shareReplay(1)
-    );
+  private selectedCountry$ = this.dataService.getCountryByName(this.countryName).pipe(
+    tap((selectedCountry: Olympic | undefined) => {
+      if (!selectedCountry) {
+        void this.router.navigate(['/not-found'], { queryParams: { errorMessage: ERROR_MESSAGES.countryNotFound(this.countryName) } });
+        return;
+      }
+      const participationYears = selectedCountry.participations.map(participation => participation.year) ?? [];
+      const medalCounts = selectedCountry.participations.map(participation => participation.medalsCount) ?? [];
+      const chartData: ChartConfiguration = this.buildChartData(participationYears, medalCounts);
+      this.chart?.destroy();
+      this.chart = this.medalChartService.createChart(
+        this.chartId,
+        chartData
+      );
+    }),
+    catchError(() => {
+      this.setTechnicalError();
+      return of(undefined);
+    }),
+    shareReplay(1)
+  );
 
-    this.kpiList$ = selectedCountry$.pipe(
-      map((selectedCountry: Olympic | undefined) => {
+  protected kpiList$: Observable<KpiList> = this.selectedCountry$.pipe(
+    map((selectedCountry: Olympic | undefined) => {
 
-        return {
-          title: selectedCountry?.country ?? countryName,
-          kpis: [
-            {
-              label: 'Number of entries',
-              value: selectedCountry?.participations.length ?? 0
-            },
-            {
-              label: 'Number of medals',
-              value: selectedCountry?.participations.reduce((total, participation) => total + participation.medalsCount, 0) ?? 0
-            },
-            {
-              label: 'Number of athletes',
-              value: selectedCountry?.participations.reduce((total, participation) => total + participation.athleteCount, 0) ?? 0
-            }
-          ]
-        };
-      }),
-      finalize(() => {
-        this.loading.set(false);
-      })
-    );
-  }
+      return {
+        title: selectedCountry?.country ?? this.countryName,
+        kpis: [
+          {
+            label: 'Number of entries',
+            value: selectedCountry?.participations.length ?? 0
+          },
+          {
+            label: 'Number of medals',
+            value: selectedCountry?.participations.reduce((total, participation) => total + participation.medalsCount, 0) ?? 0
+          },
+          {
+            label: 'Number of athletes',
+            value: selectedCountry?.participations.reduce((total, participation) => total + participation.athleteCount, 0) ?? 0
+          }
+        ]
+      };
+    }),
+    finalize(() => {
+      this.loading.set(false);
+    })
+  );
 
   ngOnDestroy(): void {
     this.chart?.destroy();
